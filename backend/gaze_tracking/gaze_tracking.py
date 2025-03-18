@@ -1,3 +1,4 @@
+
 from __future__ import division
 import os
 import cv2
@@ -116,6 +117,22 @@ class GazeTracking(object):
         if self.pupils_located:
             blinking_ratio = (self.eye_left.blinking + self.eye_right.blinking) / 2
             return blinking_ratio > 3.8
+
+    def get_gaze_status(self):
+        """Returns the current gaze status of the user as a string"""
+        if not self.pupils_located:
+            return "Eyes not detected"
+        
+        if self.is_blinking():
+            return "Blinking"
+        elif self.is_right():
+            return "Looking right"
+        elif self.is_left():
+            return "Looking left"
+        elif self.is_center():
+            return "Looking center"
+        else:
+            return "Unknown gaze direction"
 
     def annotated_frame(self):
         """Returns the main frame with pupils highlighted"""
