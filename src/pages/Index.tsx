@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { GraduationCap, Camera, Users, BookOpen } from "lucide-react";
+import { GraduationCap, Camera, Users, BookOpen, BrainCircuit } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const Index = () => {
           <Card className="p-6 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-3 bg-primary/10 rounded-full">
-                <Brain className="w-6 h-6 text-primary" />
+                <BrainCircuit className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold">Engagement Tracking</h3>
             </div>
