@@ -5,17 +5,18 @@ import EngagementIndicator from "@/components/EngagementIndicator";
 import PostureIndicator from "@/components/PostureIndicator";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-import { AlertTriangle, BookOpen } from "lucide-react";
+import { AlertTriangle, BookOpen, UserOff } from "lucide-react";
 
 const StudentDashboard = () => {
-  const [currentEngagement, setCurrentEngagement] = useState(100);
+  const [currentEngagement, setCurrentEngagement] = useState(0);
   const [engagementRemarks, setEngagementRemarks] = useState("");
   const [posture, setPosture] = useState({
     posture_status: "Not detected",
     neck_angle: 0,
     left_bend: 0,
     right_bend: 0,
-    posture_score: 100
+    posture_score: 0,
+    activity_status: "Inactive"
   });
   const { toast } = useToast();
   const [attendanceMarked, setAttendanceMarked] = useState(false);
@@ -37,7 +38,7 @@ const StudentDashboard = () => {
   };
 
   useEffect(() => {
-    if (currentEngagement < 70) {
+    if (currentEngagement < 70 && currentEngagement > 0 && posture.activity_status !== "Inactive") {
       toast({
         title: "Low Engagement Alert",
         description: engagementRemarks || "Please stay focused on the class",
@@ -45,10 +46,10 @@ const StudentDashboard = () => {
         duration: 5000,
       });
     }
-  }, [currentEngagement, engagementRemarks, toast]);
+  }, [currentEngagement, engagementRemarks, toast, posture.activity_status]);
 
   useEffect(() => {
-    if (posture.posture_status === "Bad Posture") {
+    if (posture.posture_status === "Bad Posture" && posture.activity_status !== "Inactive") {
       toast({
         title: "Poor Posture Detected",
         description: "Please sit up straight to improve your posture",
@@ -56,7 +57,7 @@ const StudentDashboard = () => {
         duration: 5000,
       });
     }
-  }, [posture.posture_status, toast]);
+  }, [posture.posture_status, toast, posture.activity_status]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 p-6 animate-fadeIn">
@@ -82,7 +83,18 @@ const StudentDashboard = () => {
               }}
             />
             
-            {currentEngagement < 70 && (
+            {posture.activity_status === "Inactive" && (
+              <Card className="p-4 bg-gray-50 border-gray-200 animate-slideUp">
+                <div className="flex items-center gap-2 text-gray-700">
+                  <UserOff className="w-5 h-5" />
+                  <p className="text-sm font-medium">
+                    No activity detected. Please position yourself in front of the camera.
+                  </p>
+                </div>
+              </Card>
+            )}
+            
+            {currentEngagement < 70 && currentEngagement > 0 && posture.activity_status !== "Inactive" && (
               <Card className="p-4 bg-red-50 border-red-200 animate-slideUp">
                 <div className="flex items-center gap-2 text-red-700">
                   <AlertTriangle className="w-5 h-5" />
@@ -96,7 +108,7 @@ const StudentDashboard = () => {
           
           <div className="space-y-4">
             <EngagementIndicator 
-              engagement={currentEngagement} 
+              engagement={posture.activity_status === "Inactive" ? 0 : currentEngagement} 
               remarks={engagementRemarks}
             />
             

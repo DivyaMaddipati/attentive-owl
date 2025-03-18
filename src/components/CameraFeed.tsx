@@ -1,9 +1,8 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Camera, CheckCircle } from "lucide-react";
+import { AlertCircle, Camera, CheckCircle, UserOff } from "lucide-react";
 import { processFrame } from "@/services/api";
 
 interface CameraFeedProps {
@@ -16,6 +15,7 @@ interface CameraFeedProps {
     left_bend: number;
     right_bend: number;
     posture_score: number;
+    activity_status: string;
   }) => void;
 }
 
@@ -32,6 +32,7 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
   const { toast } = useToast();
   const [faceDetected, setFaceDetected] = useState(false);
   const [currentName, setCurrentName] = useState<string>("");
+  const [activityStatus, setActivityStatus] = useState<string>("Inactive");
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -97,6 +98,8 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
         const result = await processFrame(frame);
         console.log("Processed frame result:", result);
         
+        setActivityStatus(result.activity_status || "Active");
+        
         if (result.faces && result.faces.length > 0) {
           setFaceDetected(true);
           
@@ -107,13 +110,11 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
               setAttendanceMarked(true);
               setCurrentName(result.faces[0]);
               
-              // Draw colored frame and name
               const frameColor = '#4CAF50';
               context.strokeStyle = frameColor;
               context.lineWidth = 3;
               context.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
               
-              // Draw name label
               context.fillStyle = frameColor;
               context.fillRect(50, 20, 200, 30);
               context.fillStyle = 'white';
@@ -136,7 +137,8 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
             neck_angle: result.neck_angle,
             left_bend: result.left_bend,
             right_bend: result.right_bend,
-            posture_score: result.posture_score
+            posture_score: result.posture_score,
+            activity_status: result.activity_status || "Active"
           });
         }
 
@@ -184,8 +186,14 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
                 </>
               ) : (
                 <>
-                  <Camera className="w-4 h-4" />
-                  <span className="text-sm">Scanning</span>
+                  {activityStatus === "Inactive" ? (
+                    <UserOff className="w-4 h-4" />
+                  ) : (
+                    <Camera className="w-4 h-4" />
+                  )}
+                  <span className="text-sm">
+                    {activityStatus === "Inactive" ? "No Activity" : "Scanning"}
+                  </span>
                 </>
               )}
             </div>

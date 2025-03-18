@@ -48,13 +48,15 @@ def analyze_posture(base64_image):
     neck_angle = 0
     left_bend = 0
     right_bend = 0
-    posture_score = 100  # Default score
+    posture_score = 0  # Default score is now 0 to indicate inactivity
+    activity_status = "Inactive"  # Added activity status
     
     # Process frame with MediaPipe Pose
     results = pose.process(rgb_frame)
     
     if results.pose_landmarks:
         landmarks = results.pose_landmarks.landmark
+        activity_status = "Active"  # If landmarks detected, user is active
 
         # Get necessary key points
         try:
@@ -69,7 +71,7 @@ def analyze_posture(base64_image):
             left_bend = calculate_angle(left_ear, left_shoulder, nose)
             right_bend = calculate_angle(right_ear, right_shoulder, nose)
 
-            # Determine Posture
+            # Determine Posture - using exact same criteria as original code
             if 50 < neck_angle < 90 and left_bend < 40 and right_bend < 40:
                 posture_status = "Good Posture"
                 posture_score = 100
@@ -78,14 +80,26 @@ def analyze_posture(base64_image):
                 # Calculate a score based on deviation from ideal angles
                 angle_deviation = abs(70 - neck_angle) + abs(20 - left_bend) + abs(20 - right_bend)
                 posture_score = max(0, 100 - angle_deviation)
+                
+                # If the score is too low, cap it at a minimum
+                posture_score = max(20, posture_score)
         
         except (IndexError, AttributeError) as e:
             print(f"Error analyzing posture landmarks: {e}")
+            activity_status = "Partially Active"  # Some landmarks detected but not all
+    else:
+        # No landmarks detected, user is inactive
+        activity_status = "Inactive"
+    
+    print(f"Posture Analysis - Status: {posture_status}, Neck Angle: {neck_angle}, " 
+          f"Left Bend: {left_bend}, Right Bend: {right_bend}, " 
+          f"Score: {posture_score}, Activity: {activity_status}")
     
     return {
         'posture_status': posture_status,
         'neck_angle': round(neck_angle, 1),
         'left_bend': round(left_bend, 1),
         'right_bend': round(right_bend, 1),
-        'posture_score': round(posture_score)
+        'posture_score': round(posture_score),
+        'activity_status': activity_status
     }

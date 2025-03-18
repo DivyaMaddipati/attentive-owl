@@ -9,6 +9,7 @@ interface ProcessFrameResponse {
   left_bend: number;
   right_bend: number;
   posture_score: number;
+  activity_status: string;
   error?: string;
 }
 
@@ -35,14 +36,15 @@ export async function processFrame(frame: string): Promise<ProcessFrameResponse>
     console.error('Error processing frame:', error);
     return {
       faces: [],
-      engagement: 100,
+      engagement: 0,
       remarks: 'Error processing image',
       gaze_status: 'unknown',
       posture_status: 'Not detected',
       neck_angle: 0,
       left_bend: 0,
       right_bend: 0,
-      posture_score: 100,
+      posture_score: 0,
+      activity_status: 'Inactive',
       error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
