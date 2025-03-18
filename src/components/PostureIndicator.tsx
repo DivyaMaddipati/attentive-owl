@@ -1,7 +1,6 @@
-
 import React from "react";
 import { Card } from "@/components/ui/card";
-import { ScanLine, ArrowUpRight, AlertTriangle, CheckCircle, UserOff } from "lucide-react";
+import { ScanLine, ArrowUpRight, AlertTriangle, CheckCircle, UserX } from "lucide-react";
 
 interface PostureIndicatorProps {
   posture: {
@@ -23,7 +22,7 @@ const PostureIndicator: React.FC<PostureIndicatorProps> = ({ posture }) => {
   };
 
   const getPostureIcon = (status: string, activity: string = "Active") => {
-    if (activity === "Inactive") return <UserOff className="w-5 h-5 text-gray-500" />;
+    if (activity === "Inactive") return <UserX className="w-5 h-5 text-gray-500" />;
     if (status === "Good Posture") return <CheckCircle className="w-5 h-5 text-green-500" />;
     if (status === "Bad Posture") return <AlertTriangle className="w-5 h-5 text-red-500" />;
     return <ScanLine className="w-5 h-5 text-gray-500" />;
@@ -92,7 +91,7 @@ const PostureIndicator: React.FC<PostureIndicatorProps> = ({ posture }) => {
       {activityStatus === "Inactive" && (
         <div className="mt-4 p-3 rounded-lg bg-gray-100 border border-gray-200">
           <p className="text-sm text-gray-600 flex items-center gap-1">
-            <UserOff className="w-4 h-4" />
+            <UserX className="w-4 h-4" />
             No person detected in the frame
           </p>
         </div>

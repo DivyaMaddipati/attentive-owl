@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import CameraFeed from "@/components/CameraFeed";
 import EngagementIndicator from "@/components/EngagementIndicator";
 import PostureIndicator from "@/components/PostureIndicator";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-import { AlertTriangle, BookOpen, UserOff } from "lucide-react";
+import { AlertTriangle, BookOpen, UserX } from "lucide-react";
 
 const StudentDashboard = () => {
   const [currentEngagement, setCurrentEngagement] = useState(0);
@@ -86,7 +85,7 @@ const StudentDashboard = () => {
             {posture.activity_status === "Inactive" && (
               <Card className="p-4 bg-gray-50 border-gray-200 animate-slideUp">
                 <div className="flex items-center gap-2 text-gray-700">
-                  <UserOff className="w-5 h-5" />
+                  <UserX className="w-5 h-5" />
                   <p className="text-sm font-medium">
                     No activity detected. Please position yourself in front of the camera.
                   </p>

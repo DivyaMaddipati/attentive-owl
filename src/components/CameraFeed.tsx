@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Camera, CheckCircle, UserOff } from "lucide-react";
+import { AlertCircle, Camera, CheckCircle, UserX } from "lucide-react";
 import { processFrame } from "@/services/api";
 
 interface CameraFeedProps {
@@ -187,7 +187,7 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
               ) : (
                 <>
                   {activityStatus === "Inactive" ? (
-                    <UserOff className="w-4 h-4" />
+                    <UserX className="w-4 h-4" />
                   ) : (
                     <Camera className="w-4 h-4" />
                   )}
