@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
@@ -10,12 +9,20 @@ interface CameraFeedProps {
   onFrame: (frame: string) => void;
   onFaceDetection: (faces: string[]) => void;
   onEngagementUpdate?: (score: number, remarks: string) => void;
+  onPostureUpdate?: (posture: {
+    posture_status: string;
+    neck_angle: number;
+    left_bend: number;
+    right_bend: number;
+    posture_score: number;
+  }) => void;
 }
 
 const CameraFeed: React.FC<CameraFeedProps> = ({ 
   onFrame, 
   onFaceDetection,
-  onEngagementUpdate 
+  onEngagementUpdate,
+  onPostureUpdate 
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -119,6 +126,16 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
           onEngagementUpdate(result.engagement, result.remarks || "");
         }
 
+        if (onPostureUpdate) {
+          onPostureUpdate({
+            posture_status: result.posture_status,
+            neck_angle: result.neck_angle,
+            left_bend: result.left_bend,
+            right_bend: result.right_bend,
+            posture_score: result.posture_score
+          });
+        }
+
       } catch (error) {
         console.error("Error processing frame:", error);
       }
@@ -126,7 +143,7 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
 
     const interval = setInterval(captureFrame, 1000);
     return () => clearInterval(interval);
-  }, [isActive, onFrame, onFaceDetection, attendanceMarked, toast, onEngagementUpdate]);
+  }, [isActive, onFrame, onFaceDetection, attendanceMarked, toast, onEngagementUpdate, onPostureUpdate]);
 
   return (
     <Card className="p-4 w-full bg-white/80 backdrop-blur-sm shadow-xl animate-fadeIn">

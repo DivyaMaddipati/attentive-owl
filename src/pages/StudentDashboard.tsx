@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import CameraFeed from "@/components/CameraFeed";
 import EngagementIndicator from "@/components/EngagementIndicator";
+import PostureIndicator from "@/components/PostureIndicator";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { AlertTriangle, BookOpen } from "lucide-react";
@@ -9,6 +10,13 @@ import { AlertTriangle, BookOpen } from "lucide-react";
 const StudentDashboard = () => {
   const [currentEngagement, setCurrentEngagement] = useState(100);
   const [engagementRemarks, setEngagementRemarks] = useState("");
+  const [posture, setPosture] = useState({
+    posture_status: "Not detected",
+    neck_angle: 0,
+    left_bend: 0,
+    right_bend: 0,
+    posture_score: 100
+  });
   const { toast } = useToast();
   const [attendanceMarked, setAttendanceMarked] = useState(false);
 
@@ -39,6 +47,17 @@ const StudentDashboard = () => {
     }
   }, [currentEngagement, engagementRemarks, toast]);
 
+  useEffect(() => {
+    if (posture.posture_status === "Bad Posture") {
+      toast({
+        title: "Poor Posture Detected",
+        description: "Please sit up straight to improve your posture",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  }, [posture.posture_status, toast]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 p-6 animate-fadeIn">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -56,6 +75,10 @@ const StudentDashboard = () => {
                 setCurrentEngagement(score);
                 setEngagementRemarks(remarks);
                 console.log("Engagement updated:", score, remarks);
+              }}
+              onPostureUpdate={(postureData) => {
+                setPosture(postureData);
+                console.log("Posture updated:", postureData);
               }}
             />
             
@@ -76,6 +99,8 @@ const StudentDashboard = () => {
               engagement={currentEngagement} 
               remarks={engagementRemarks}
             />
+            
+            <PostureIndicator posture={posture} />
             
             {attendanceMarked && (
               <Card className="p-4 bg-green-50 border-green-200">

@@ -2,9 +2,10 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Users, AlertTriangle, CheckCircle } from "lucide-react";
+import { Download, Users, AlertTriangle, CheckCircle, Activity } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
+import { getAttendance, downloadAttendance } from "@/services/api";
 
 interface AttendanceRecord {
   date: string;
@@ -12,6 +13,7 @@ interface AttendanceRecord {
   status: string;
   engagement: number;
   remarks: string;
+  posture: string;
 }
 
 const TeacherDashboard = () => {
@@ -19,19 +21,12 @@ const TeacherDashboard = () => {
 
   const { data: attendanceData, isLoading } = useQuery({
     queryKey: ['attendance'],
-    queryFn: async () => {
-      const response = await fetch('http://localhost:5000/api/get-attendance');
-      if (!response.ok) {
-        throw new Error('Failed to fetch attendance data');
-      }
-      return response.json() as Promise<AttendanceRecord[]>;
-    }
+    queryFn: getAttendance
   });
 
-  const downloadAttendance = async () => {
+  const handleDownloadAttendance = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/download-attendance');
-      const blob = await response.blob();
+      const blob = await downloadAttendance();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -73,7 +68,7 @@ const TeacherDashboard = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-gray-900">Teacher Dashboard</h1>
-          <Button onClick={downloadAttendance} className="bg-primary hover:bg-primary/90">
+          <Button onClick={handleDownloadAttendance} className="bg-primary hover:bg-primary/90">
             <Download className="w-4 h-4 mr-2" />
             Download Full Report
           </Button>
@@ -108,9 +103,20 @@ const TeacherDashboard = () => {
                     )}
                   </div>
                 </div>
-                <p className="mt-2 text-sm font-medium">
-                  Remarks: {record.remarks}
-                </p>
+                
+                <div className="mt-3 grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium mb-1">Engagement Status:</p>
+                    <p className="text-sm">{record.remarks}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium mb-1 flex items-center gap-1">
+                      <Activity className="w-4 h-4" />
+                      Posture Status:
+                    </p>
+                    <p className="text-sm">{record.posture || "Not recorded"}</p>
+                  </div>
+                </div>
               </div>
             ))}
 
