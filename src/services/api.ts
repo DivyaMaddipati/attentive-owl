@@ -14,6 +14,7 @@ interface ProcessFrameResponse {
 
 export async function processFrame(frame: string): Promise<ProcessFrameResponse> {
   try {
+    console.log("Sending frame to backend for processing");
     const response = await fetch('http://localhost:5000/api/process-frame', {
       method: 'POST',
       headers: {
@@ -23,10 +24,13 @@ export async function processFrame(frame: string): Promise<ProcessFrameResponse>
     });
 
     if (!response.ok) {
+      console.error(`Backend error: ${response.status}`);
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log("Received response from backend:", data);
+    return data;
   } catch (error) {
     console.error('Error processing frame:', error);
     return {
@@ -46,11 +50,15 @@ export async function processFrame(frame: string): Promise<ProcessFrameResponse>
 
 export async function getAttendance() {
   try {
+    console.log("Fetching attendance data from backend");
     const response = await fetch('http://localhost:5000/api/get-attendance');
     if (!response.ok) {
+      console.error(`Backend error: ${response.status}`);
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    return await response.json();
+    const data = await response.json();
+    console.log("Received attendance data:", data);
+    return data;
   } catch (error) {
     console.error('Error fetching attendance:', error);
     throw error;
@@ -59,8 +67,10 @@ export async function getAttendance() {
 
 export async function downloadAttendance() {
   try {
+    console.log("Requesting attendance download from backend");
     const response = await fetch('http://localhost:5000/api/download-attendance');
     if (!response.ok) {
+      console.error(`Backend error: ${response.status}`);
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     return response.blob();

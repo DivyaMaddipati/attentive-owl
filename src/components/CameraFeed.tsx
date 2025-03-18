@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
@@ -92,7 +93,10 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
       onFrame(frame);
 
       try {
+        console.log("Capturing and processing frame");
         const result = await processFrame(frame);
+        console.log("Processed frame result:", result);
+        
         if (result.faces && result.faces.length > 0) {
           setFaceDetected(true);
           
