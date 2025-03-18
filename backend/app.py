@@ -65,8 +65,4 @@ def get_attendance():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    # Ensure data directory exists
-    if not os.path.exists('data'):
-        os.makedirs('data')
-        
     app.run(debug=True, port=5000)
