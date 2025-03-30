@@ -42,7 +42,7 @@ const StudentDashboard = () => {
         toast({
           title: "Unknown Person Detected",
           description: "You are not registered in the system.",
-          variant: "warning",
+          variant: "destructive", // Changed from "warning" to "destructive"
           duration: 5000,
         });
       }
@@ -152,3 +152,4 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
+
