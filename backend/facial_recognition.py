@@ -61,14 +61,22 @@ def process_face_recognition(base64_image):
     
     for face_encoding in face_encodings:
         matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+        face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+        
         name = "Unknown"
         
-        if True in matches:
-            best_match_index = np.argmin(face_recognition.face_distance(known_face_encodings, face_encoding))
-            if matches[best_match_index]:
+        # Set a threshold for recognition (adjust this based on testing)
+        threshold = 0.5
+        
+        if any(matches):
+            best_match_index = np.argmin(face_distances)
+            min_distance = face_distances[best_match_index]
+            
+            if min_distance < threshold:  # Only accept if confidence is high
                 name = known_face_names[best_match_index]
-                
+        
         face_names.append(name)
+        print(face_names)
     
     return {
         'faces': face_names,
