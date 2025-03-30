@@ -68,19 +68,36 @@ def process_face_recognition(base64_image):
         # Set a threshold for recognition (adjust this based on testing)
         threshold = 0.5
         
-        if any(matches):
+        if len(face_distances) > 0:  # Ensure there are face distances to compare
             best_match_index = np.argmin(face_distances)
             min_distance = face_distances[best_match_index]
             
-            if min_distance < threshold:  # Only accept if confidence is high
+            if matches[best_match_index] and min_distance < threshold:  # Only accept if confidence is high
                 name = known_face_names[best_match_index]
         
         face_names.append(name)
-        print(face_names)
+        print(f"Face detected: {name} with confidence: {1 - min_distance if len(face_distances) > 0 else 'N/A'}")
+    
+    # Determine if the frame contains any activity (faces)
+    activity_status = "Active" if face_locations else "Inactive"
     
     return {
         'faces': face_names,
         'engagement': engagement_score,
         'remarks': engagement_remarks,
-        'gaze_status': gaze.get_gaze_status()
+        'gaze_status': get_gaze_status(gaze),
+        'activity_status': activity_status
     }
+
+def get_gaze_status(gaze):
+    """Get the gaze status as a string"""
+    if gaze.is_blinking():
+        return "blinking"
+    elif gaze.is_right():
+        return "looking_right"
+    elif gaze.is_left():
+        return "looking_left"
+    elif gaze.is_center():
+        return "looking_center"
+    else:
+        return "unknown"

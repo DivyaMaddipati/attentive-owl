@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import CameraFeed from "@/components/CameraFeed";
 import EngagementIndicator from "@/components/EngagementIndicator";
@@ -19,6 +20,7 @@ const StudentDashboard = () => {
   });
   const { toast } = useToast();
   const [attendanceMarked, setAttendanceMarked] = useState(false);
+  const [unknownPersonDetected, setUnknownPersonDetected] = useState(false);
 
   const handleFrame = (frame: string) => {
     console.log("Frame captured for processing");
@@ -26,13 +28,24 @@ const StudentDashboard = () => {
 
   const handleFaceDetection = (faces: string[]) => {
     console.log("Faces detected:", faces);
-    if (faces.length > 0 && !attendanceMarked) {
-      toast({
-        title: "Attendance Marked Successfully",
-        description: `Welcome ${faces[0]}! Your attendance has been recorded.`,
-        duration: 5000,
-      });
-      setAttendanceMarked(true);
+    if (faces.length > 0) {
+      if (faces[0] !== "Unknown" && !attendanceMarked) {
+        toast({
+          title: "Attendance Marked Successfully",
+          description: `Welcome ${faces[0]}! Your attendance has been recorded.`,
+          duration: 5000,
+        });
+        setAttendanceMarked(true);
+        setUnknownPersonDetected(false);
+      } else if (faces[0] === "Unknown") {
+        setUnknownPersonDetected(true);
+        toast({
+          title: "Unknown Person Detected",
+          description: "You are not registered in the system.",
+          variant: "warning",
+          duration: 5000,
+        });
+      }
     }
   };
 
@@ -88,6 +101,17 @@ const StudentDashboard = () => {
                   <UserX className="w-5 h-5" />
                   <p className="text-sm font-medium">
                     No activity detected. Please position yourself in front of the camera.
+                  </p>
+                </div>
+              </Card>
+            )}
+            
+            {unknownPersonDetected && (
+              <Card className="p-4 bg-yellow-50 border-yellow-200 animate-slideUp">
+                <div className="flex items-center gap-2 text-yellow-700">
+                  <AlertTriangle className="w-5 h-5" />
+                  <p className="text-sm font-medium">
+                    Unknown person detected. Please register to mark attendance.
                   </p>
                 </div>
               </Card>

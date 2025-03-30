@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
@@ -103,24 +104,38 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
         if (result.faces && result.faces.length > 0) {
           setFaceDetected(true);
           
-          if (!attendanceMarked) {
-            const isKnownFace = result.faces[0] !== "Unknown";
-            if (isKnownFace) {
-              onFaceDetection(result.faces);
-              setAttendanceMarked(true);
-              setCurrentName(result.faces[0]);
-              
-              const frameColor = '#4CAF50';
-              context.strokeStyle = frameColor;
-              context.lineWidth = 3;
-              context.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
-              
-              context.fillStyle = frameColor;
-              context.fillRect(50, 20, 200, 30);
-              context.fillStyle = 'white';
-              context.font = '16px Arial';
-              context.fillText(result.faces[0], 60, 40);
-            }
+          const detectedFaceName = result.faces[0];
+          setCurrentName(detectedFaceName);
+          
+          // Only mark attendance for known faces (not "Unknown")
+          if (detectedFaceName !== "Unknown" && !attendanceMarked) {
+            onFaceDetection(result.faces);
+            setAttendanceMarked(true);
+            
+            // Add colored frame for known faces
+            const frameColor = '#4CAF50';
+            context.strokeStyle = frameColor;
+            context.lineWidth = 3;
+            context.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+            
+            context.fillStyle = frameColor;
+            context.fillRect(50, 20, 200, 30);
+            context.fillStyle = 'white';
+            context.font = '16px Arial';
+            context.fillText(detectedFaceName, 60, 40);
+          }
+          // Add yellow frame for unknown faces
+          else if (detectedFaceName === "Unknown") {
+            const frameColor = '#FFC107';
+            context.strokeStyle = frameColor;
+            context.lineWidth = 3;
+            context.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+            
+            context.fillStyle = frameColor;
+            context.fillRect(50, 20, 200, 30);
+            context.fillStyle = 'black';
+            context.font = '16px Arial';
+            context.fillText("Unknown Person", 60, 40);
           }
         } else {
           setFaceDetected(false);
@@ -171,7 +186,9 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
               attendanceMarked 
                 ? "bg-green-500 text-white"
                 : faceDetected 
-                  ? "bg-yellow-500 text-white"
+                  ? currentName === "Unknown"
+                    ? "bg-yellow-500 text-white"
+                    : "bg-blue-500 text-white"
                   : "bg-gray-500 text-white"
             }`}>
               {attendanceMarked ? (
@@ -182,7 +199,9 @@ const CameraFeed: React.FC<CameraFeedProps> = ({
               ) : faceDetected ? (
                 <>
                   <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">Face Detected</span>
+                  <span className="text-sm">
+                    {currentName === "Unknown" ? "Unknown Person" : "Face Detected"}
+                  </span>
                 </>
               ) : (
                 <>
