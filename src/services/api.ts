@@ -50,10 +50,14 @@ export async function processFrame(frame: string): Promise<ProcessFrameResponse>
   }
 }
 
-export async function getAttendance() {
+export async function getAttendance(sessionId?: string) {
   try {
     console.log("Fetching attendance data from backend");
-    const response = await fetch('http://localhost:5000/api/get-attendance');
+    const url = sessionId 
+      ? `http://localhost:5000/api/get-attendance?session_id=${sessionId}`
+      : 'http://localhost:5000/api/get-attendance';
+      
+    const response = await fetch(url);
     if (!response.ok) {
       console.error(`Backend error: ${response.status}`);
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -78,6 +82,42 @@ export async function downloadAttendance() {
     return response.blob();
   } catch (error) {
     console.error('Error downloading attendance:', error);
+    throw error;
+  }
+}
+
+export async function resetSession() {
+  try {
+    console.log("Requesting new session from backend");
+    const response = await fetch('http://localhost:5000/api/reset-session', {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      console.error(`Backend error: ${response.status}`);
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log("New session created:", data);
+    return data.session_id;
+  } catch (error) {
+    console.error('Error resetting session:', error);
+    throw error;
+  }
+}
+
+export async function getCurrentSession() {
+  try {
+    console.log("Fetching current session from backend");
+    const response = await fetch('http://localhost:5000/api/current-session');
+    if (!response.ok) {
+      console.error(`Backend error: ${response.status}`);
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    console.log("Current session:", data);
+    return data.session_id;
+  } catch (error) {
+    console.error('Error fetching current session:', error);
     throw error;
   }
 }

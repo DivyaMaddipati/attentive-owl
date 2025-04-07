@@ -1,3 +1,4 @@
+
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 import os
@@ -10,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 # Import module functions
 from facial_recognition import process_face_recognition
-from attendance_tracker import update_attendance, get_attendance_records
+from attendance_tracker import update_attendance, get_attendance_records, reset_session, get_current_session_id
 from posture_detector import analyze_posture
 
 app = Flask(__name__)
@@ -58,26 +59,52 @@ def process_frame():
 @app.route('/api/download-attendance', methods=['GET'])
 def download_attendance():
     try:
-        print("Received attendance download request")
+        logger.info("Received attendance download request")
+        attendance_file = 'attendance.xlsx'
+        
+        if not os.path.exists(attendance_file):
+            logger.error("Attendance file not found")
+            return jsonify({'error': 'Attendance file not found'}), 404
+            
         return send_file(
-            'attendance.xlsx',
+            attendance_file,
             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             as_attachment=True,
             download_name=f'attendance_{date.today().strftime("%Y-%m-%d")}.xlsx'
         )
     except Exception as e:
-        print(f"Error in download_attendance: {str(e)}")
+        logger.error(f"Error in download_attendance: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/get-attendance', methods=['GET'])
 def get_attendance():
     try:
-        print("Received get attendance request")
-        records = get_attendance_records()
-        print(f"Retrieved {len(records)} attendance records")
+        logger.info("Received get attendance request")
+        session_id = request.args.get('session_id', get_current_session_id())
+        records = get_attendance_records(session_id)
+        logger.info(f"Retrieved {len(records)} attendance records for session {session_id}")
         return jsonify(records)
     except Exception as e:
-        print(f"Error in get_attendance: {str(e)}")
+        logger.error(f"Error in get_attendance: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+        
+@app.route('/api/reset-session', methods=['POST'])
+def new_session():
+    try:
+        logger.info("Received request to start a new session")
+        session_id = reset_session()
+        return jsonify({'success': True, 'session_id': session_id})
+    except Exception as e:
+        logger.error(f"Error starting new session: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/current-session', methods=['GET'])
+def current_session():
+    try:
+        session_id = get_current_session_id()
+        return jsonify({'session_id': session_id})
+    except Exception as e:
+        logger.error(f"Error getting current session: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/test', methods=['GET'])

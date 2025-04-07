@@ -32,7 +32,7 @@ const StudentDashboard = () => {
       if (faces[0] !== "Unknown" && !attendanceMarked) {
         toast({
           title: "Attendance Marked Successfully",
-          description: `Welcome ${faces[0]}! Your attendance has been recorded.`,
+          description: `Welcome ${faces[0]}! Your attendance has been recorded for this session.`,
           duration: 5000,
         });
         setAttendanceMarked(true);
@@ -140,7 +140,7 @@ const StudentDashboard = () => {
             {attendanceMarked && (
               <Card className="p-4 bg-green-50 border-green-200">
                 <p className="text-sm text-green-700">
-                  Your attendance has been recorded for today's session.
+                  Your attendance has been recorded for this session.
                 </p>
               </Card>
             )}
@@ -152,4 +152,3 @@ const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
-
