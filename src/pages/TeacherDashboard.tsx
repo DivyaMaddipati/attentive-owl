@@ -26,8 +26,10 @@ const TeacherDashboard = () => {
   useQuery({
     queryKey: ['currentSession'],
     queryFn: getCurrentSession,
-    onSuccess: (data) => {
-      setCurrentSessionId(data);
+    onSettled: (data) => {
+      if (data) {
+        setCurrentSessionId(data);
+      }
     }
   });
 
